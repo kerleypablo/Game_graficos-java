@@ -3,6 +3,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 
@@ -21,12 +22,18 @@ public class Game extends Canvas implements Runnable {
 	private BufferedImage image;
 	
 	private Spritesheet sheet; 
-	
-	private BufferedImage player;
+	private BufferedImage[] player;
+	private int frames = 0;
+	private int maxframes = 10;// tempo animar personagem < mais rapido 
+	private int curAnimation = 0,maxAnimation = 3;
 	
 	public Game() {
 		sheet = new Spritesheet("/spritesheet.png");
-		player = sheet.getSprite(0, 0, 16, 16);
+		player = new BufferedImage[4];
+		player[0] = sheet.getSprite(0, 0, 16, 16);
+		player[1] = sheet.getSprite(16,0,16,16);
+		player[2] = sheet.getSprite(32,0,16,16);
+		player[3] = sheet.getSprite(48,0,16,16);
 		setPreferredSize(new Dimension(WIDTH*SCALE,HEIGHT*SCALE));
 		initiFrame();
 		image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
@@ -69,7 +76,16 @@ public class Game extends Canvas implements Runnable {
 	
 	
 	public void tick() {
+		frames ++ ;
+		if (frames> maxframes) {
+			frames = 0;
+			curAnimation ++ ;
+		if (curAnimation > maxAnimation) {
+			curAnimation = 0;
+		}
 		
+		}
+			
 	}
 	
 	public void render() {
@@ -79,14 +95,15 @@ public class Game extends Canvas implements Runnable {
 			return;
 		}
 		Graphics g = image.getGraphics();
-		g.setColor(new Color(40,40,40));
+		g.setColor(new Color(20,60,60));
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		
 		//renderização do jogo
-		g.drawImage(player, 20, 20, null);
+		Graphics2D g2 = (Graphics2D) g;
+		g2.drawImage(player[curAnimation], 90, 90, null);
 		
-		
-		
+
+		g.dispose();
 		g = bs.getDrawGraphics();
 		g.drawImage(image, 0, 0, WIDTH*SCALE, HEIGHT*SCALE, null);
 		bs.show();
